@@ -1,0 +1,212 @@
+@import url(http://fonts.googleapis.com/css?family=Orbitron);
+body {
+  background: #222;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2em;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+  margin: -10px 0px 0px 50%;
+}
+
+/* 全てに適応 */
+
+* {}
+
+/* menubar */
+
+.menubar {
+  position: absolute;
+  margin: 0px 0px 0px -50%;
+}
+.child {
+  padding: 15px 0px 0px 0px;
+  width: 200px;
+  height: 560px;
+  background: #111;
+}
+ul {
+  padding: 0px 0px 0px 10px;
+  list-style-type: none;
+}
+li {
+  margin: 20px 0px 20px 0px;
+  padding: 0px 0px 0px 0px;
+  border-style: solid;
+  border-width: 5px;
+  border-top: 0;
+  border-bottom: 0;
+  border-color: #d1feff;
+  box-shadow: -5px 0px 5px -5px #0bd9c6, 5px 0px 5px -5px #0bd9c6 inset;
+}
+.menuHOME {
+  width: 100px;
+  padding: 10px 0px 10px 0px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2em;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0px 0px 10px #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.menuCHANGE {
+  width: 100px;
+  padding: 10px 0px 10px 0px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.0em;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0px 0px 10px #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.menuABOUT {
+  width: 100px;
+  padding: 10px 0px 10px 0px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1em;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0px 0px 10px #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.menuLOGOUT {
+  width: 100px;
+  padding: 10px 0px 10px 0px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.0em;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0px 0px 10px #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* main */
+
+.main {
+  background: #222;
+  position: absolute;
+  width: 300px;
+  height: 560px;
+  padding: 15px 0px 0px 0px;
+  margin: 0px 0px 0px -150px;
+  z-index: 100;
+}
+.bunObj {
+  width: 50px;
+  height: 50px;
+  margin: 5px 0px 0px 5px;
+  padding: 1px 0px 0px 0px;
+}
+.bun {
+  background: #fff;
+  box-shadow: 0px 0px 4px #fff;
+  height: 4px;
+  margin: 9px;
+}
+.cross {
+  background: #fff;
+  box-shadow: 0px 0px 4px #fff;
+  height: 5px;
+  width: 40px;
+  margin: 9px;
+  display: none;
+}
+.right {
+  position: absolute;
+  margin: 20px 0px 0px 0px;
+  transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.left {
+  position: absolute;
+  margin: 20px 0px 0px 0px;
+  transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+.content {
+  margin: 0px 0px 0px 30px;
+}
+.user {
+  color: #0bd9c6;
+  text-shadow: 0px 0px 8px #0bd9c6;
+}
+#canvas {
+  width: 200px;
+  height: 240px;
+  margin: 0px 0px 0px 0px;
+  background: #fff;
+  border: 2px solid #0bd9c6;
+  box-shadow: 0px 0px 10px #0bd9c6;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+.sensor {
+  width: 200px;
+  margin: 25px 0px 0px 70px;
+  text-align: left;
+}
+.meter {
+  color: #0bd9c6;
+  text-shadow: 0px 0px 4px #0bd9c6;
+}
+#ColorWheel {
+  width: 150px;
+  margin: 10px 0px 0px 60px;
+}
+#change {
+  margin: 20px 0px 0px 0px;
+  width: 130px;
+  height: 40px;
+  font-weight: 900;
+  text-shadow: 0px 0px 4px #fff;
+  border-style: solid;
+  border-color: #0bd9c6;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #0bd9c6;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3em;
+  text-align: center;
+  color: #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+#logout {
+  margin: 20px 0px 0px 0px;
+  width: 130px;
+  height: 40px;
+  font-weight: 900;
+  text-shadow: 0px 0px 4px #fff;
+  border-style: solid;
+  border-color: #0bd9c6;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #0bd9c6;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1em;
+  text-align: center;
+  color: #fff;
+  background: #111;
+  border-style: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}

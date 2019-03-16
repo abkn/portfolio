@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    window.addEventListener('load', function() {
+      var UA = navigator.userAgent;
+      if (
+        //判別条件start
+        (UA.indexOf('iPhone') !== -1) //iphoneか、
+        || ((UA.indexOf('Android') !== -1) && (UA.indexOf('Mobile') !== -1)) //またはAndroidMobile端末、
+        || (UA.indexOf('Windows Phone') !== -1) //またはWindowsPhone、
+        || (UA.indexOf('BlackBerry') !== -1)　 //またはBlackBerryの場合
+        //判別条件end
+      ) {
+        //　スマホサイト
+        location.href = "/phoneMain";
+      } else {
+        //　PCサイト
+        location.href = "/pcMain";
+      };
+    }, false);
+  </script>
+</head>
+
+<body>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>LOGOUT</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes" name="viewport">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      window.addEventListener('load', function() {
+        var isMenuShow = false;
+        $(".bunObj").click(function() {
+          if (isMenuShow) {
+            $(".main").animate({
+              'margin-left': '-=150px'
+            }, 300);
+            $(".bun").animate({
+              'opacity': '1'
+            }, 200);
+            $(".bun").show(150);
+            $(".cross").animate({
+              'opacity': '0'
+            }, 100);
+            $(".cross").hide(150);
+            isMenuShow = false;
+          } else {
+            $(".main").animate({
+              'margin-left': '+=150px'
+            }, 300);
+            $(".bun").animate({
+              'opacity': '0'
+            }, 100);
+            $(".bun").hide(150);
+            $(".cross").animate({
+              'opacity': '1'
+            }, 200);
+            $(".cross").show(100);
+            isMenuShow = true;
+          }
+        });
+        update();
+      }, false);
+    </script>
+    <link href="../public/stylesheets/phone.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+    <!-- menubar -->
+    <div class="menubar">
+      <nav class="child">
+        <ul>
+          <li>
+            <form action="/phoneMain" method="get">
+              <input class="menuHOME" type="submit" value="HOME">
+            </form>
+          </li>
+          <li>
+            <form action="change.php" method="get">
+              <input name=id type="hidden" value="<%= id %>">
+              <input name=image type="hidden" value="<%= image %>">
+              <input name=color type="hidden" value="<%= color %>">
+              <input name=type type="hidden" value="<%= type %>">
+              <input name=user type="hidden" value="<%= user %>">
+              <input class="menuCHANGE" type="submit" value="CHANGE">
+            </form>
+          </li>
+          <li>
+            <form action="/about" method="get">
+              <input class="menuABOUT" type="submit" value="ABOUT">
+            </form>
+          </li>
+          <li>
+            <form action="/logout" method="get">
+              <input class="menuLOGOUT" type="submit" value="LOGOUT">
+            </form>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <!-- main -->
+    <div class="main">
+      <div class="bunObj">
+        <div class="bun top"></div>
+        <div class="bun middle"></div>
+        <div class="bun bottom"></div>
+        <div class="cross right"></div>
+        <div class="cross left"></div>
+      </div>
+      <div class="content">about</div>
+    </body>
+
+  </html>

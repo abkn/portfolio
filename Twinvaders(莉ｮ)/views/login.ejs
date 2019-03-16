@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    window.addEventListener('load', function() {
+      var UA = navigator.userAgent;
+      if (
+        //判別条件start
+        (UA.indexOf('iPhone') !== -1) //iphoneか、
+        || ((UA.indexOf('Android') !== -1) && (UA.indexOf('Mobile') !== -1)) //またはAndroidMobile端末、
+        || (UA.indexOf('Windows Phone') !== -1) //またはWindowsPhone、
+        || (UA.indexOf('BlackBerry') !== -1)　 //またはBlackBerryの場合
+        //判別条件end
+      ) {
+        //　スマホサイト
+        location.href = "../public/html/phoneLogin.html";
+      } else {
+        //　PCサイト
+        location.href = "../public/html/pcLogin.html";
+      };
+    }, false);
+  </script>
+</head>
+
+<body>
+</body>
+
+</html>

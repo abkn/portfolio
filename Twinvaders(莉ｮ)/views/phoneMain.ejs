@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>HOME</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes" name="viewport">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <script src="../public/javascript/shake.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var UA;
+      var isShake = false;
+      var width = 1150;
+      var height = 750;
+      var x;
+      var y;
+      var z;
+      var alpha;
+      var beta;
+      var gamma;
+      var posX = width / 2;
+      var posY = height / 2;
+      var angle = 0;
+      var dead = false;
+      window.addEventListener('load', function() {
+
+        UA = navigator.userAgent;
+        var isMenuShow = false;
+
+        var myShakeEvent = new Shake({threshold: 15, timeout: 1000});
+        // start listening to device motion
+        myShakeEvent.start();
+        // register a shake event
+        window.addEventListener('shake', shakeEventDidOccur, false);
+        //shake event callback
+        function shakeEventDidOccur() {
+          //put your own code here etc.
+          isShake = true;
+          angle = Math.random() * Math.PI * 2.0;
+        }
+
+        $("#lose").hide();
+        $("#homeMain").show();
+        $(".enemy").html();
+
+        $(".bunObj").click(function() {
+          if (isMenuShow) {
+            $(".main").animate({
+              'margin-left': '-=150px'
+            }, 300);
+            $(".bun").animate({
+              'opacity': '1'
+            }, 200);
+            $(".bun").show(150);
+            $(".cross").animate({
+              'opacity': '0'
+            }, 100);
+            $(".cross").hide(150);
+            isMenuShow = false;
+          } else {
+            $(".main").animate({
+              'margin-left': '+=150px'
+            }, 300);
+            $(".bun").animate({
+              'opacity': '0'
+            }, 100);
+            $(".bun").hide(150);
+            $(".cross").animate({
+              'opacity': '1'
+            }, 200);
+            $(".cross").show(100);
+            isMenuShow = true;
+          }
+        });
+        update();
+      }, false);
+
+      /*------------------------- ここから下はsokectIO-------------------------*/
+      var ioSocket = io();
+
+      // サーバーからのデータ受け取り処理
+      ioSocket.on("connect", function() {}); // 接続
+      ioSocket.on("disconnect", function() {}); // 切断
+
+      ioSocket.on("s2c_bulletId", function(data) {
+        if (data.id == "<%= id %>") {
+          var src = "http://twitter.com/" + data.user;
+          $("#lose").show();
+          $("#homeMain").hide();
+          $(".enemy").html(data.user);
+          setTimeout(function() {
+            window.location.href = src;
+          }, 2000);
+          dead = true;
+        }
+      });
+
+      window.addEventListener("devicemotion", function(event) {
+        x = event.accelerationIncludingGravity.x;
+        y = event.accelerationIncludingGravity.y;
+        z = event.accelerationIncludingGravity.z;
+
+        if (((UA.indexOf('Android') !== -1) && (UA.indexOf('Mobile') !== -1))) {
+          x = Math.round(x * 10) / 10 * (-1);
+        } else {
+          x = Math.round(x * 10) / 10;
+        }
+        y = Math.round(y * 10) / 10;
+        z = Math.round(z * 10) / 10;
+      }, true);
+
+      window.addEventListener('deviceorientation', function(event) {
+        alpha = event.alpha;
+        beta = event.beta;
+        gamma = event.gamma;
+
+        alpha = Math.round(alpha * 10) / 10;
+        beta = Math.round(beta * 10) / 10;
+        gamma = Math.round(gamma * 10) / 10;
+      }, true);
+      /*--------------------------canvas-------------------------------*/
+
+      function update() {
+        requestAnimationFrame(update);
+
+        /*閾値を越えたら傾けた角度の分動く*/
+        if (Math.abs(30 - beta) > 10) {
+          posY += (30 - beta) * 0.1;
+        }
+        if (Math.abs(x) > 1.0) {
+          posX += x;
+        }
+        /*枠の外には出ないようにする*/
+        var limit = 30;
+        if (posX >= width - limit) {
+          posX = width - limit;
+        }
+        if (posX <= limit) {
+          posX = limit;
+        }
+        if (posY > height - limit) {
+          posY = height - limit;
+        }
+        if (posY < limit) {
+          posY = limit;
+        }
+        posX = Math.floor(posX);
+        posY = Math.floor(posY);
+
+        $("#motion").html("<div>x : <span class='meter'>" + x + "</span></div>" + "<div>y : <span class='meter'>" + y + "</span></div>" + "<div>z : <span class='meter'>" + z + "</span></div>");
+        $("#orientation").html("<div>alpha : <span class='meter'>" + alpha + "</span></div>" + "<div>beta : <span class='meter'>" + beta + "</span></div>" + "<div>gamma : <span class='meter'>" + gamma + "</span></div>");
+        // クライアントからサーバーへ送信
+        if (!dead) {
+          ioSocket.emit("c2s_message", {
+            posX: posX,
+            posY: posY,
+            id: "<%= id %>",
+            type: "<%= type %>",
+            color: "<%= color %>",
+            user: "<%= user %>",
+            image: "<%= image %>",
+            isShake: isShake,
+            angle: angle
+          });
+          draw();
+        }
+        isShake = false;
+      }
+
+      function draw() {
+        var image = "<%= image %>";
+        var color = "<%= color %>";
+        var type = "<%= type %>";
+        var iconX = 200 / 2;
+        var iconY = 240 / 2;
+        var size = 100;
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        ctx.save();
+        ctx.shadowColor = color; //指定した色
+        ctx.shadowBlur = 10; //シャドウの強さ
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, 500, 500);
+
+        ctx.shadowBlur = 10; //シャドウを付ける
+        ctx.fillStyle = color; //指定した色
+
+        drawUser(type, ctx, iconX, iconY, size); //ドット描写
+
+        /*iconX,iconYに画像を表示*/
+        ctx.fillRect(iconX - size / 2 - 1, iconY - size / 2 - 1, size + 2, size + 2);
+        ctx.shadowBlur = 0;
+        var img = new Image();
+        img.src = image;
+        ctx.drawImage(img, iconX - size / 2, iconY - size / 2, size, size);
+      }
+
+      function drawUser(type, ctx, iconX, iconY, size) {
+        DD = new Date(); //時間取得
+        var seconds = DD.getSeconds();
+        if (seconds % 2 == 0) {
+          pose = -1; //ポーズ切り替え
+        } else {
+          pose = 1;
+        }
+        if (type == "typeA") {
+          if (pose == 1) { //2
+            ctx.fillRect(iconX - size / 6, iconY - size * 2 / 3, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY - size, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY, size / 6, size / 3); //左腕
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size / 2, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 2, iconY + size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX + size / 2, iconY, size / 6, size / 3); //右腕
+            ctx.fillRect(iconX + size / 2, iconY + size / 2, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 3, iconY + size * 2 / 3, size / 6, size / 6);
+          } else { //5
+            ctx.fillRect(iconX - size / 6, iconY - size * 2 / 3, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY - size, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY, size / 6, size / 3); //左腕
+            ctx.fillRect(iconX - size * 5 / 6, iconY + size / 6, size / 6, size / 2);
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX + size / 2, iconY, size / 6, size / 3); //右腕
+            ctx.fillRect(iconX + size * 2 / 3, iconY + size / 6, size / 6, size / 2);
+            ctx.fillRect(iconX + size / 2, iconY + size * 2 / 3, size / 6, size / 6);
+          }
+        }
+        if (type == "typeB") {
+          if (pose == 1) { //1
+            ctx.fillRect(iconX - size * 5 / 6, iconY - size / 3, size / 6, size / 3); //左腕
+            ctx.fillRect(iconX - size * 2 / 3, iconY - size / 6, size / 6, size / 2);
+
+            ctx.fillRect(iconX + size * 2 / 3, iconY - size / 3, size / 6, size / 3); //右腕
+            ctx.fillRect(iconX + size / 2, iconY - size / 6, size / 6, size / 2);
+
+            ctx.fillRect(iconX - size / 3, iconY + size / 2, size / 6, size / 3); //足
+            ctx.fillRect(iconX + size / 6, iconY + size / 2, size / 6, size / 3);
+          } else { //12
+            ctx.fillRect(iconX - size * 5 / 6, iconY - size / 3, size / 6, size / 3); //左腕
+            ctx.fillRect(iconX - size * 2 / 3, iconY - size / 6, size / 6, size / 3);
+
+            ctx.fillRect(iconX + size * 2 / 3, iconY - size / 3, size / 6, size / 3); //右腕
+            ctx.fillRect(iconX + size / 2, iconY - size / 6, size / 6, size / 3);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size / 2, size / 6, size / 6); //足
+            ctx.fillRect(iconX + size / 2, iconY + size / 2, size / 6, size / 6);
+          }
+        }
+        if (type == "typeC") {
+          if (pose == 1) { //3
+            ctx.fillRect(iconX, iconY - size * 5 / 6, size / 6, size / 3); //アンテナ
+            ctx.fillRect(iconX - size / 6, iconY - size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size / 2, iconY + size / 2, size / 6, size / 3); //左足
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size * 5 / 6, size / 6, size / 6);
+
+            ctx.fillRect(iconX + size / 3, iconY + size / 2, size / 6, size / 3); //右足
+            ctx.fillRect(iconX + size / 2, iconY + size * 5 / 6, size / 6, size / 6);
+          } else {
+            ctx.fillRect(iconX - size / 6, iconY - size * 5 / 6, size / 6, size / 3); //アンテナ
+            ctx.fillRect(iconX, iconY - size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size / 2, iconY + size / 2, size / 6, size / 6); //左足
+            ctx.fillRect(iconX - size / 3, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY + size * 5 / 6, size / 6, size / 6);
+
+            ctx.fillRect(iconX + size / 3, iconY + size / 2, size / 6, size / 6); //右足
+            ctx.fillRect(iconX + size / 6, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX, iconY + size * 5 / 6, size / 6, size / 6);
+          }
+        }
+        if (type == "typeD") {
+          if (pose == 1) { //6
+            ctx.fillRect(iconX - size / 6, iconY - size * 2 / 3, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY - size, size / 6, size / 6);
+
+            ctx.fillRect(iconX, iconY + size / 2, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX - size / 6, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX, iconY + size * 5 / 6, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY - size / 3, size / 6, size * 2 / 3); //端
+            ctx.fillRect(iconX + size / 2, iconY - size / 3, size / 6, size * 2 / 3);
+          } else {
+            ctx.fillRect(iconX, iconY - size * 2 / 3, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX - size / 6, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX, iconY - size, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size / 6, iconY + size / 2, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY + size * 5 / 6, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY - size / 3, size / 6, size * 2 / 3); //端
+            ctx.fillRect(iconX + size / 2, iconY - size / 3, size / 6, size * 2 / 3);
+          }
+        }
+        if (type == "typeE") {
+          if (pose == 1) { //9
+            ctx.fillRect(iconX - size / 6, iconY - size * 5 / 6, size / 3, size / 6); //頭
+            ctx.fillRect(iconX - size / 3, iconY - size * 2 / 3, size * 2 / 3, size / 6);
+
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size / 6, size / 6, size / 2); //左足
+            ctx.fillRect(iconX - size * 5 / 6, iconY + size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX + size / 2, iconY + size / 6, size / 6, size / 2); //右足
+            ctx.fillRect(iconX + size * 2 / 3, iconY + size * 2 / 3, size / 6, size / 6);
+          } else {
+            ctx.fillRect(iconX - size / 6, iconY - size, size / 6, size / 6); //頭
+            ctx.fillRect(iconX - size / 6, iconY - size * 5 / 6, size / 3, size / 6);
+            ctx.fillRect(iconX - size / 3, iconY - size * 2 / 3, size * 2 / 3, size / 6);
+
+            ctx.fillRect(iconX - size / 2, iconY + size * 2 / 3, size / 6, size / 6); //足
+            ctx.fillRect(iconX - size / 3, iconY + size / 2, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 6, iconY + size / 2, size / 6, size / 3);
+            ctx.fillRect(iconX + size / 6, iconY + size / 2, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 3, iconY + size * 2 / 3, size / 6, size / 6);
+          }
+        }
+        if (type == "typeF") {
+          if (pose == 1) { //10
+            ctx.fillRect(iconX - size / 2, iconY - size * 5 / 6, size / 6, size / 6); //耳
+            ctx.fillRect(iconX - size / 3, iconY - size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 3, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 6, iconY - size * 2 / 3, size / 6, size / 6);
+
+            ctx.fillRect(iconX - size * 5 / 6, iconY + size * 2 / 3, size / 6, size / 6); //足
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size / 2, size * 4 / 3, size / 6);
+            ctx.fillRect(iconX + size * 2 / 3, iconY + size * 2 / 3, size / 6, size / 6);
+          } else {
+            ctx.fillRect(iconX - size / 6, iconY - size, size / 6, size / 6); //アンテナ
+            ctx.fillRect(iconX, iconY - size * 5 / 6, size / 6, size / 3);
+
+            ctx.fillRect(iconX - size * 5 / 6, iconY + size / 2, size / 6, size / 6); //足
+            ctx.fillRect(iconX - size * 2 / 3, iconY + size * 2 / 3, size / 3, size / 6);
+            ctx.fillRect(iconX - size / 3, iconY + size / 2, size * 2 / 3, size / 6);
+            ctx.fillRect(iconX + size / 3, iconY + size * 2 / 3, size / 3, size / 6);
+            ctx.fillRect(iconX + size * 2 / 3, iconY + size / 2, size / 6, size / 6);
+          }
+        }
+        if (type == "typeG") {
+          if (pose == 1) { //7
+            ctx.fillRect(iconX - size / 6, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX, iconY - size * 2 / 3, size / 3, size / 6);
+            ctx.fillRect(iconX + size * 2 / 3, iconY - size / 6, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 2, iconY, size / 6, size / 3);
+            ctx.fillRect(iconX, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 3, iconY + size / 2, size / 3, size / 6);
+            ctx.fillRect(iconX - size * 5 / 6, iconY, size / 6, size / 6);
+            ctx.fillRect(iconX - size * 2 / 3, iconY - size / 3, size / 6, size / 3);
+          } else {
+            ctx.fillRect(iconX - size / 2, iconY - size * 5 / 6, size / 6, size / 6);
+            ctx.fillRect(iconX - size / 3, iconY - size * 2 / 3, size / 3, size / 6);
+            ctx.fillRect(iconX + size * 2 / 3, iconY - size / 2, size / 6, size / 6);
+            ctx.fillRect(iconX + size / 2, iconY - size / 3, size / 6, size / 3);
+            ctx.fillRect(iconX + size / 3, iconY + size * 2 / 3, size / 6, size / 6);
+            ctx.fillRect(iconX, iconY + size / 2, size / 3, size / 6);
+            ctx.fillRect(iconX - size * 5 / 6, iconY + size / 3, size / 6, size / 6);
+            ctx.fillRect(iconX - size * 2 / 3, iconY, size / 6, size / 3);
+          }
+        }
+      }
+    </script>
+    <link href="../public/stylesheets/phone.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+    <!-- menubar -->
+    <div class="menubar">
+      <nav class="child">
+        <ul>
+          <li>
+            <form action="/phoneMain" method="get">
+              <input class="menuHOME" type="submit" value="HOME">
+            </form>
+          </li>
+          <li>
+            <form action="change.php" method="get">
+              <input name=id type="hidden" value="<%= id %>">
+              <input name=image type="hidden" value="<%= image %>">
+              <input name=color type="hidden" value="<%= color %>">
+              <input name=type type="hidden" value="<%= type %>">
+              <input name=user type="hidden" value="<%= user %>">
+              <input class="menuCHANGE" type="submit" value="CHANGE">
+            </form>
+          </li>
+          <li>
+            <form action="/about" method="get">
+              <input class="menuABOUT" type="submit" value="ABOUT">
+            </form>
+          </li>
+          <li>
+            <form action="/logout" method="get">
+              <input class="menuLOGOUT" type="submit" value="LOGOUT">
+            </form>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <!-- main -->
+    <div class="main">
+      <div class="bunObj">
+        <div class="bun top"></div>
+        <div class="bun middle"></div>
+        <div class="bun bottom"></div>
+        <div class="cross right"></div>
+        <div class="cross left"></div>
+      </div>
+      <div class="content">
+        <div id="lose">
+          <p>
+            <span class="user enemy"></span>
+            さん にやられた</p>
+            <p>２秒後に
+              <span class="user enemy"></span>
+              さん のTwitterに飛びます</p>
+        </div>
+        <div id="homeMain">
+          <canvas height="240" id="canvas" width="200"></canvas>
+          <p>ようこそ
+            <span class="user">
+              <%= user %>
+            </span>
+            さん</p>
+          <div class="sensor">
+            <div id="motion"></div>
+            <div id="orientation"></div>
+          </div>
+        </div>
+      </div>
+    </body>
+
+  </html>
